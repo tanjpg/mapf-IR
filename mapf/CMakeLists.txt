@@ -10,7 +10,12 @@ else()
     target_compile_options(lib-mapf PUBLIC -O3 -Wall -mtune=native -march=native)
 endif()
 target_compile_features(lib-mapf PUBLIC cxx_std_17)
-target_include_directories(lib-mapf INTERFACE ./include)
+
+# target_include_directories(lib-mapf INTERFACE ./include)
+
+target_include_directories(lib-mapf PUBLIC 
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
 
 add_subdirectory(../third_party/grid-pathfinding/graph ./graph)
 target_link_libraries(lib-mapf lib-graph)

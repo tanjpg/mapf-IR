@@ -5,6 +5,76 @@
 
 #include "../include/util.hpp"
 
+Problem::Problem(
+  const std::string& _map_file,
+  const int& _num_agents,
+  const std::vector<
+    std::pair<
+      std::pair<int, int> ,std::pair<int, int>>>& _custom_s_g,
+  const int& _seed,
+  const bool& _random_problem,
+  const bool& _well_formed,
+  const int _max_comp_time,
+  const int _max_timestep): instance_initialized(true){
+
+    G = new Grid(_map_file);
+    num_agents = _num_agents;
+    MT = new std::mt19937(_seed);
+    
+    if (_random_problem) {
+        // read_scen = false;
+        config_s.clear();
+        config_g.clear();
+    }else{
+      for(auto sg : _custom_s_g){
+        int x_s = sg.first.first;
+        int y_s = sg.first.second;
+        int x_g = sg.second.first;
+        int y_g = sg.second.second;
+        if (!G->existNode(x_s, y_s)) {
+          halt("start node (" + std::to_string(x_s) + ", " + std::to_string(y_s) +
+              ") does not exist, invalid scenario");
+        }
+        if (!G->existNode(x_g, y_g)) {
+          halt("goal node (" + std::to_string(x_g) + ", " + std::to_string(y_g) +
+              ") does not exist, invalid scenario");
+        }
+
+        Node* s = G->getNode(x_s, y_s);
+        Node* g = G->getNode(x_g, y_g);
+        config_s.push_back(s);
+        config_g.push_back(g);
+      }
+    }
+    
+    
+    max_timestep = _max_timestep;
+    max_comp_time = _max_comp_time;
+
+    // set default value not identified params
+    if (MT == nullptr) MT = new std::mt19937(DEFAULT_SEED);
+    if (max_timestep == 0) max_timestep = DEFAULT_MAX_TIMESTEP;
+    if (max_comp_time == 0) max_comp_time = DEFAULT_MAX_COMP_TIME;
+
+    // check starts/goals
+    if (num_agents <= 0) halt("invalid number of agents");
+    const int config_s_size = config_s.size();
+    if (!config_s.empty() && num_agents > config_s_size) {
+      warn("given starts/goals are not sufficient\nrandomly create instances");
+    }
+    if (num_agents > config_s_size) {
+      if (_well_formed) {
+        setWellFormedInstance();
+      } else {
+        setRandomStartsGoals();
+      }
+    }
+
+    // trimming
+    config_s.resize(num_agents);
+    config_g.resize(num_agents);
+}
+
 Problem::Problem(const std::string& _instance)
     : instance(_instance), instance_initialized(true)
 {

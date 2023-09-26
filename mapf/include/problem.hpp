@@ -57,6 +57,20 @@ private:
 
 public:
   Problem(const std::string& _instance);
+
+  Problem(
+    const std::string& _map_file,
+    const int& _num_agents,
+    const std::vector<
+      std::pair<
+        std::pair<int, int>,
+        std::pair<int, int>>>& _custom_s_g,
+    const int& _seed,
+    const bool& _random_problem,
+    const bool& _well_formed,
+    const int _max_comp_time,
+    const int _max_timestep);
+
   Problem(Problem* P, Config _config_s, Config _config_g, int _max_comp_time,
           int _max_timestep);
   Problem(Problem* P, int _max_comp_time);

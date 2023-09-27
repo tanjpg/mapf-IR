@@ -8,3 +8,4 @@
 [submodule "third_party/grid-pathfinding"]
 	path = third_party/grid-pathfinding
 	url = https://github.com/tanjpg/grid-pathfinding.git
+	branch = fix/glenn/cmakelists-fix
